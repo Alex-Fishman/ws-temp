@@ -3,6 +3,15 @@
     margin: 0 auto;
     padding: 32px 24px 64px;
 
+    &__progress-bar {
+        height: 3px;
+        margin-bottom: 20px;
+        border-radius: 2px;
+        background: linear-gradient(90deg, #e8edf5 25%, #3b6ef5 50%, #e8edf5 75%);
+        background-size: 400px 100%;
+        animation: shimmer 1.2s infinite linear;
+    }
+
     &__header {
         margin-bottom: 24px;
     }

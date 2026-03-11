@@ -25,16 +25,19 @@ export default function ResultsSection({ results, loading, error, searchContext 
 
     return (
         <div className="results-section">
+            {loading && <div className="results-section__progress-bar" />}
             <div className="results-section__header">
                 <h1 className="results-section__title">Select your ski trip</h1>
                 <p className="results-section__subtitle">{subtitle}</p>
             </div>
             {error ? <p className="results-section__error">{error}</p> : null}
             <div className="results-section__list">
-                {results.map(hotel => (
-                    <HotelCard key={hotel.id} hotel={hotel} resortName={searchContext.resortName} />
-                ))}
-                {loading ? skeletonCards : null}
+                {results.length > 0
+                    ? results.map(hotel => (
+                        <HotelCard key={hotel.id} hotel={hotel} resortName={searchContext.resortName} />
+                    ))
+                    : skeletonCards
+                }
             </div>
         </div>
     );
