@@ -17,9 +17,14 @@ export class HotelsService {
         (_, i) => Number(dto.groupSize) + i,
       );
 
+      const randomDelay = () =>
+        new Promise<void>((resolve) => setTimeout(resolve, Math.random() * 3000));
+
       const tasks = this.providers.flatMap((provider) =>
         groupSizes.map((size) =>
-          provider.search({ ...dto, groupSize: size, skiSiteId: Number(dto.skiSiteId) }),
+          randomDelay().then(() =>
+            provider.search({ ...dto, groupSize: size, skiSiteId: Number(dto.skiSiteId) }),
+          ),
         ),
       );
 
