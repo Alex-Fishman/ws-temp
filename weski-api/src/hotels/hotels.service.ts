@@ -24,12 +24,15 @@ export class HotelsService {
       );
 
       let remaining = tasks.length;
+      const seenIds = new Set<string>();
 
       tasks.forEach((task) => {
         task
           .then((hotels) => {
-            if (hotels.length > 0) {
-              subscriber.next({ data: hotels });
+            const newHotels = hotels.filter((h) => !seenIds.has(h.id));
+            newHotels.forEach((h) => seenIds.add(h.id));
+            if (newHotels.length > 0) {
+              subscriber.next({ data: newHotels });
             }
           })
           .catch((err: unknown) => {

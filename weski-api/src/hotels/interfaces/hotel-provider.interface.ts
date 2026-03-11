@@ -5,12 +5,19 @@ export interface HotelSearchQuery {
   endDate: string;   // YYYY-MM-DD
 }
 
+export interface HotelImage {
+  url: string;
+  isMain: boolean;
+}
+
 export interface Hotel {
   id: string;
   name: string;
   pricePerNight: number;
   maxGuests: number;
   skiSiteId: number;
+  rating: number;
+  images: HotelImage[];
 }
 
 export interface IHotelProvider {

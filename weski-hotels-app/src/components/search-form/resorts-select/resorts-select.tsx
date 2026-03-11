@@ -5,7 +5,7 @@ interface Props {
     value: number;
 }
 
-const resorts = [
+export const resorts = [
     {
       id: 1,
       name: 'Val Thorens'

@@ -14,7 +14,14 @@ interface WeskiMockApiResponse {
     accommodations: Array<{
       HotelCode: string;
       HotelName: string;
+      HotelDescriptiveContent: {
+        Images: Array<{
+          MainImage?: string;
+          URL: string;
+        }>;
+      };
       HotelInfo: {
+        Rating: string;
         Beds: string;
       };
       PricesInfo: {
@@ -48,18 +55,21 @@ export class WeskiMockProvider implements IHotelProvider {
       console.error('[WeskiMockProvider] fetch threw:', err);
       return [];
     }
-    // console.log('[WeskiMockProvider] status:', response.status)
     if (!response.ok) return [];
 
     const data: WeskiMockApiResponse = await response.json();
-    // console.log('[WeskiMockProvider] raw response:', JSON.stringify(data, null, 2));
 
     return data.body.accommodations.map((h) => ({
-      id: h.HotelCode,
+      id: `${h.HotelCode}_${h.PricesInfo.AmountAfterTax}`, // not sure HotelCode is enough to verify that it is unique, combine with price
       name: h.HotelName,
       pricePerNight: parseFloat(h.PricesInfo.AmountAfterTax),
       maxGuests: parseInt(h.HotelInfo.Beds, 10),
       skiSiteId: query.skiSiteId,
+      rating: parseInt(h.HotelInfo.Rating, 10),
+      images: (h.HotelDescriptiveContent?.Images ?? []).map((img) => ({
+        url: img.URL,
+        isMain: img.MainImage === 'True',
+      })),
     }));
   }
 }
