@@ -8,13 +8,20 @@ function toApiDate(isoDate: string): string {
 }
 
 interface WeskiMockApiResponse {
-  hotels: Array<{
-    id: number;
-    name: string;
-    price_per_night: number;
-    max_guests: number;
-    ski_site_id: number;
-  }>;
+  statusCode: number;
+  body: {
+    success: string;
+    accommodations: Array<{
+      HotelCode: string;
+      HotelName: string;
+      HotelInfo: {
+        Beds: string;
+      };
+      PricesInfo: {
+        AmountAfterTax: string;
+      };
+    }>;
+  };
 }
 
 @Injectable()
@@ -45,14 +52,14 @@ export class WeskiMockProvider implements IHotelProvider {
     if (!response.ok) return [];
 
     const data: WeskiMockApiResponse = await response.json();
-    // console.log('[WeskiMockProvider]', JSON.stringify(data, null, 2));
+    // console.log('[WeskiMockProvider] raw response:', JSON.stringify(data, null, 2));
 
-    return data.hotels.map((h) => ({
-      id: String(h.id),
-      name: h.name,
-      pricePerNight: h.price_per_night,
-      maxGuests: h.max_guests,
-      skiSiteId: h.ski_site_id,
+    return data.body.accommodations.map((h) => ({
+      id: h.HotelCode,
+      name: h.HotelName,
+      pricePerNight: parseFloat(h.PricesInfo.AmountAfterTax),
+      maxGuests: parseInt(h.HotelInfo.Beds, 10),
+      skiSiteId: query.skiSiteId,
     }));
   }
 }
