@@ -33,8 +33,8 @@ interface WeskiMockApiResponse {
 
 @Injectable()
 export class WeskiMockProvider implements IHotelProvider {
-  private readonly apiUrl = process.env.WESKI_API_URL ?? '';
-  
+  // in real world use the env only
+  private readonly apiUrl = process.env.WESKI_API_URL ?? 'https://gya7b1xubh.execute-api.eu-west-2.amazonaws.com/default/HotelsSimulator'; 
 
   async search(query: HotelSearchQuery): Promise<Hotel[]> {
     let response: Response;
