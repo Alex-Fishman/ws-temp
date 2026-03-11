@@ -26,7 +26,7 @@ export function streamHotels(
   params: HotelSearchParams,
   onBatch: (hotels: Hotel[]) => void,
   onDone: () => void,
-  onError: (err: Event) => void,
+  onError: (message: string) => void,
 ): () => void {
   const queryString = new URLSearchParams({
     skiSiteId: String(params.skiSiteId),
@@ -42,13 +42,17 @@ export function streamHotels(
     onBatch(hotels);
   };
 
-  eventSource.addEventListener('error', (event) => {
-    if (eventSource.readyState === EventSource.CLOSED) {
-      onDone();
-    } else {
-      onError(event);
-    }
+  eventSource.addEventListener('done', () => {
     eventSource.close();
+    onDone();
+  });
+
+  eventSource.addEventListener('error', (event) => {
+    eventSource.close();
+    const message = event instanceof MessageEvent
+      ? (JSON.parse(event.data as string) as { message: string }).message
+      : 'Connection error';
+    onError(message);
   });
 
   return () => eventSource.close();

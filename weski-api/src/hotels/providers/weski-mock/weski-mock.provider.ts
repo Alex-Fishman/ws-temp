@@ -53,9 +53,11 @@ export class WeskiMockProvider implements IHotelProvider {
       });
     } catch (err) {
       console.error('[WeskiMockProvider] fetch threw:', err);
-      return [];
+      throw err;
     }
-    if (!response.ok) return [];
+    if (!response.ok) {
+      throw new Error(`[WeskiMockProvider] HTTP ${response.status}`);
+    }
 
     const data: WeskiMockApiResponse = await response.json();
 

@@ -53,8 +53,8 @@ export default function App() {
                 });
             },
             () => setLoading(false),
-            () => {
-                setError('Could not load hotels. Please try again.');
+            (message) => {
+                setError(message);
                 setLoading(false);
             },
         );

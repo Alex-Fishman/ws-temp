@@ -24,6 +24,7 @@ export class HotelsService {
       );
 
       let remaining = tasks.length;
+      let errorCount = 0;
       const seenIds = new Set<string>();
 
       tasks.forEach((task) => {
@@ -37,9 +38,16 @@ export class HotelsService {
           })
           .catch((err: unknown) => {
             console.error('[HotelsService] provider search failed:', err);
+            errorCount++;
           })
           .finally(() => {
-            if (--remaining === 0) subscriber.complete();
+            if (--remaining === 0) {
+              if (errorCount === tasks.length) {
+                subscriber.next({ type: 'error', data: { message: 'All providers failed' } } as any);
+              }
+              subscriber.next({ type: 'done', data: [] } as any);
+              subscriber.complete();
+            }
           });
       });
     });
