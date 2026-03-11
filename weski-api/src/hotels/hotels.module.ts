@@ -13,7 +13,7 @@ import { WeskiMock2Provider } from './providers/weski-mock2/weski-mock2.provider
     {
       provide: HOTEL_PROVIDERS,
       useFactory: (weskiMock: WeskiMockProvider, weskiMock2: WeskiMock2Provider) => [weskiMock, weskiMock2],
-      inject: [WeskiMockProvider, WeskiMock2Provider],
+      inject: [WeskiMockProvider, WeskiMock2Provider], // <-- inject providers
     },
     HotelsService,
   ],
