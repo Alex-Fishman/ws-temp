@@ -1,0 +1,58 @@
+import { Injectable } from '@nestjs/common';
+import { Hotel, HotelSearchQuery, IHotelProvider } from '../../interfaces/hotel-provider.interface';
+
+// Converts YYYY-MM-DD to MM/DD/YYYY as required by the external API
+function toApiDate(isoDate: string): string {
+  const [year, month, day] = isoDate.split('-');
+  return `${month}/${day}/${year}`;
+}
+
+interface WeskiMockApiResponse {
+  hotels: Array<{
+    id: number;
+    name: string;
+    price_per_night: number;
+    max_guests: number;
+    ski_site_id: number;
+  }>;
+}
+
+@Injectable()
+export class WeskiMockProvider implements IHotelProvider {
+  private readonly apiUrl = process.env.WESKI_API_URL ?? '';
+  
+
+  async search(query: HotelSearchQuery): Promise<Hotel[]> {
+    let response: Response;
+    try {
+      response = await fetch(this.apiUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          query: {
+            ski_site: query.skiSiteId,
+            from_date: toApiDate(query.startDate),
+            to_date: toApiDate(query.endDate),
+            group_size: query.groupSize,
+          },
+        }),
+      });
+    } catch (err) {
+      console.error('[WeskiMockProvider] fetch threw:', err);
+      return [];
+    }
+    // console.log('[WeskiMockProvider] status:', response.status)
+    if (!response.ok) return [];
+
+    const data: WeskiMockApiResponse = await response.json();
+    // console.log('[WeskiMockProvider]', JSON.stringify(data, null, 2));
+
+    return data.hotels.map((h) => ({
+      id: String(h.id),
+      name: h.name,
+      pricePerNight: h.price_per_night,
+      maxGuests: h.max_guests,
+      skiSiteId: h.ski_site_id,
+    }));
+  }
+}
